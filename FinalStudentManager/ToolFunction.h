@@ -6,3 +6,4 @@ void ClearScreen();
 void md5Encode(unsigned char* dest_str, unsigned int dest_len, char* md5_str);
 void ClearInputBuf();
 void MsgBox(char* msg);
+void SetConsoleSize(int cols, int lines);

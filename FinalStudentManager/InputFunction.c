@@ -55,6 +55,11 @@ void MenuSectionInput(char* dest) {
 	GetInput(dest, 1, NO_COVER, Number);
 }
 
+void PhoneNumberInput(char* dest)
+{
+	GetInput(dest, 11, NO_COVER, Number);
+}
+
 int AllAc(char c)
 {
 	return 1;

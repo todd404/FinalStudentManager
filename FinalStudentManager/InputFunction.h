@@ -14,6 +14,7 @@ void GetInput(char* dest, int length, int isCover, TestFunc test);
 void PasswordInput(char* dest);
 void UserNameInput(char* dest);
 void MenuSectionInput(char* dest);
+void PhoneNumberInput(char* dest);
 
 int AllAc(char c);
 int Number(char c);

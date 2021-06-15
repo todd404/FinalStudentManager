@@ -10,7 +10,6 @@
 void ClearScreen()
 {
 	system("cls");
-	
 }
 
 void md5Encode(unsigned char* dest_str, unsigned int dest_len, char* md5_str)
@@ -43,4 +42,11 @@ void ClearInputBuf()
 void MsgBox(char* msg)
 {
 	MessageBoxA(0, msg, 0, 0);
+}
+
+void SetConsoleSize(int cols, int lines)
+{
+	char command[512] = "";
+	sprintf_s(command, 512, "mode con: cols=%d lines=%d", cols, lines);
+	system(command);
 }
