@@ -7,7 +7,6 @@
 
 #define MD5_SIZE 16
 
-
 void ClearScreen()
 {
 	system("cls");
@@ -39,4 +38,9 @@ void md5Encode(unsigned char* dest_str, unsigned int dest_len, char* md5_str)
 void ClearInputBuf()
 {
 	fflush(stdin);
+}
+
+void MsgBox(char* msg)
+{
+	MessageBoxA(0, msg, 0, 0);
 }

@@ -1,4 +1,6 @@
 #include "login.h"
+#include "StudentFunction.h"
+
 #include <stdio.h>
 #include <string.h>
 #pragma once
@@ -7,6 +9,7 @@ typedef struct {
 	char user[MAX_USER_NAME];
 	char passwordMD5[MD5_STR_LEN];
 	UserGroup group;
+	long long id;
 } LoginInfo;
 
 void LoginInfoInit(LoginInfo* info)
@@ -45,7 +48,7 @@ int QueryLoginInfoCallBack(void* loginInfo, int col, char** col_val, char** col_
 
 	UserGroup g = atoi(col_val[2]);
 	temp->group = g;
-
+	temp->id = atoll(col_val[3]);
 	return 0;
 }
 
@@ -54,7 +57,7 @@ int QueryLoginInfoCallBack(void* loginInfo, int col, char** col_val, char** col_
 int QueryLoginInfo(char* user, LoginInfo* info, Sql* sql)
 {
 	char s[512] = "";
-	sprintf_s(s, 512, "select * from login where user = \"%s\";", user);
+	sprintf_s(s, 512, "select * from t_login where user = \"%s\";", user);
 	char* errmsg = NULL;
 	LoginInfoInit(info);
 
@@ -63,7 +66,7 @@ int QueryLoginInfo(char* user, LoginInfo* info, Sql* sql)
 	return (!(info->group == null));
 }
 
-//验证成功返回用户组
+//验证成功更新logininfo的用户组与id信息，返回用户组
 //否则返回0
 int confirm(LoginInfo* info, Sql* sql)
 {
@@ -72,7 +75,11 @@ int confirm(LoginInfo* info, Sql* sql)
 		return 0;
 
 	if (!strcmp(info->passwordMD5, temp.passwordMD5))
-		return temp.group;
+	{
+		info->group = temp.group;
+		info->id = temp.id;
+		return info->group;
+	}
 	
 	return 0;
 }
@@ -96,7 +103,10 @@ void LoginProccess(Sql* sql)
 		ShowLoginUi();
 		GetUser(&info);
 		GetPassWord(&info);
-		info.group = confirm(&info, sql);
+		confirm(&info, sql);
 		count++;
 	}
+
+	StudentProcess(info.id, sql);
+
 }

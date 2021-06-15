@@ -33,6 +33,15 @@
     <ClCompile Include="InputFunction.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="StudentFunction.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="char_conversion.h">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="char_conversion.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ToolFunction.h">
@@ -48,6 +57,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="InputFunction.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="StudentFunction.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -10,3 +10,13 @@ void OpenDB(Sql* sql)
 		exit(510);
 	}
 }
+
+void gtou(char* dest, int len, char* src)
+{
+	gb2312ToUtf8(dest, strlen(src), src, strlen(src));
+}
+
+void utog(char* dest, int len, char* src)
+{
+	utf8ToGb2312(dest, strlen(src), src, strlen(src));
+}

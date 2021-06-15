@@ -43,6 +43,10 @@ void UserNameInput(char* dest)
 	GetInput(dest, MAX_USER_NAME, NO_COVER, UserName);
 }
 
+void MenuSectionInput(char* dest) {
+	GetInput(dest, 1, NO_COVER, Number);
+}
+
 int AllAc(char c)
 {
 	return 1;
