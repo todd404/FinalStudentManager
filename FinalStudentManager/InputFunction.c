@@ -4,7 +4,9 @@
 void GetInput(char* dest, int maxLength, int isCover, TestFunc test)
 {
 	char c; int i = 0;
-	for (i = 0; i < maxLength && ((c = getch()) != '\r');)
+
+	input:
+	for (; i < maxLength && ((c = getch()) != '\r');)
 	{
 		if (c != '\b') {
 			if (!test(c))
@@ -26,7 +28,13 @@ void GetInput(char* dest, int maxLength, int isCover, TestFunc test)
 	}
 
 	if (i == maxLength) {
-		while (getch() != '\r');
+		while ((c = getch()) != '\r') {
+			if (c == '\b') {
+				i--;
+				printf("\b \b");
+				goto input;
+			}
+		}
 	}
 
 	printf("\n");
