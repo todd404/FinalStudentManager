@@ -51,9 +51,18 @@ void UserNameInput(char* dest)
 	GetInput(dest, MAX_USER_NAME, NO_COVER, UserName);
 }
 
-void MenuSectionInput(char* dest) {
+void MenuSectionInput(char* dest) 
+{
 	GetInput(dest, 1, NO_COVER, Number);
 }
+
+int GetSection()
+{
+	char section[2] = { "" };
+	MenuSectionInput(section);
+	return atoi(section);
+}
+
 
 void PhoneNumberInput(char* dest)
 {
@@ -83,4 +92,9 @@ int Lowercase(char c)
 int UserName(char c)
 {
 	return (Number(c) || Capital(c) || Lowercase(c) || c == '_');
+}
+
+int Date(char c)
+{
+	return (Number(c) || (c == '-'));
 }

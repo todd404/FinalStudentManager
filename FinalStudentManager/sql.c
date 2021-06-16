@@ -11,12 +11,23 @@ void OpenDB(Sql* sql)
 	}
 }
 
-void gtou(char* dest, int len, char* src)
+int GetResultCount(Sql* sql, const char* s)
 {
-	gb2312ToUtf8(dest, strlen(src), src, strlen(src));
+	char * errmsg, ** result; int rowNum = 0, colNum = 0;
+	int r = sqlite3_get_table(sql->db, s, &result, &rowNum, &colNum, &errmsg);
+	return rowNum;
 }
 
-void utog(char* dest, int len, char* src)
+int IsStudentIdInDB(Sql* sql, const char* id)
 {
-	utf8ToGb2312(dest, strlen(src), src, strlen(src));
+	char testSql[512];
+	sprintf_s(testSql, 512, "select stu_id from t_student where stu_id = %s", id);
+	return GetResultCount(sql, testSql);
+}
+
+int IsTeacherIdInDB(Sql* sql, const char* id)
+{
+	char testSql[512];
+	sprintf_s(testSql, 512, "select teacher_id from t_teacher where teacher_id = %s", id);
+	return GetResultCount(sql, testSql);
 }

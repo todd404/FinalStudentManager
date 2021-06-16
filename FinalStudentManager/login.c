@@ -1,16 +1,19 @@
 #include "login.h"
+#include "AdminFunction.h"
 #include "StudentFunction.h"
 
 #include <stdio.h>
 #include <string.h>
 #pragma once
 
+typedef void(*ProcessFunction)(long long, Sql*);
 typedef struct {
 	char user[MAX_USER_NAME];
 	char passwordMD5[MD5_STR_LEN];
 	UserGroup group;
 	long long id;
 } LoginInfo;
+ProcessFunction ProcessTable[3] = { StudentProcess, NULL, AdminProcess};
 
 void LoginInfoInit(LoginInfo* info)
 {
@@ -48,7 +51,9 @@ int QueryLoginInfoCallBack(void* loginInfo, int col, char** col_val, char** col_
 
 	UserGroup g = atoi(col_val[2]);
 	temp->group = g;
-	temp->id = atoll(col_val[3]);
+	
+	if(col_val[3] != NULL)
+		temp->id = atoll(col_val[3]);
 	return 0;
 }
 
@@ -98,7 +103,7 @@ void LoginProccess(Sql* sql)
 			exit(1203);
 		}
 		if (count > 0)
-			printf("Wrong User Name Or PassWord\n");
+			MsgBox("用户名或密码错误");
 
 		ShowLoginUi();
 		GetUser(&info);
@@ -107,6 +112,5 @@ void LoginProccess(Sql* sql)
 		count++;
 	}
 
-	StudentProcess(info.id, sql);
-
+	ProcessTable[info.group - 1](info.id, sql);
 }

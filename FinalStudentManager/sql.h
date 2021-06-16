@@ -1,6 +1,5 @@
 #pragma once
 #include "sqlite3.h"
-#include "char_conversion.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,5 +14,6 @@ typedef struct {
 } Sql;
 
 void OpenDB(Sql* sql);
-void gtou(char* dest, int len, char* src);
-void utog(char* dest, int len, char* src);
+int GetResultCount(Sql* sql, const char* s);
+int IsStudentIdInDB(Sql* sql, const char* id);
+int IsTeacherIdInDB(Sql* sql, const char* id);

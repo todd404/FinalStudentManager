@@ -26,16 +26,16 @@ char COL_NAME[9][512] = { "" };
 Sql* SQL;
 
 StudentInfo QueryStudentInfo(long long id);
-int GetSection();
 void UpdateStudentInfo(int section, const char* newVal, StudentInfo* info);
 
 void ShowStudentUi(StudentInfo* info);
 
 void PrintStudentInfo(StudentInfo* info);
 void EditStudentInfo(StudentInfo* info);
+void PrintScore(StudentInfo* info);
 void Exit(StudentInfo* info) { exit(0); };
 
-const SectionFunction FUNCTION_TABLE[4] = { PrintStudentInfo, EditStudentInfo, NULL, Exit };
+const SectionFunction FUNCTION_TABLE[4] = { PrintStudentInfo, EditStudentInfo, PrintScore, Exit };
 
 int QueryStudentInfoCallBack(void* stuInfo, int colNum, char** colVal, char** colName)
 {
@@ -71,7 +71,7 @@ StudentInfo QueryStudentInfo(long long id)
 	return info;
 }
 
-void PrintMenu(const char* name)
+void PrintStudentMenu(const char* name)
 {
 	printf("======= welcome %s(Student) =======\n", name);
 	printf("\t1. 查询个人信息\n");
@@ -82,18 +82,11 @@ void PrintMenu(const char* name)
 	printf("请输入选项: ");
 }
 
-int GetSection()
-{
-	char section[2] = { "" };
-	MenuSectionInput(section);
-	return atoi(section);
-}
-
 void ShowStudentUi(StudentInfo* info)
 {
 	while (1) {
 		ClearScreen();
-		PrintMenu(info->name);
+		PrintStudentMenu(info->name);
 		int section = GetSection();
 
 		if (section < 1 || section > 4)
@@ -153,6 +146,22 @@ end:
 	return;
 }
 
+int QueryScoreCallBack(void* counter, int colNum, char** colVal, char** colName)
+{
+	printf("%s: %s\n", colVal[0], colVal[1]);
+	return 0;
+}
+
+void PrintScore(StudentInfo* info)
+{
+	ClearScreen();
+	char sql[512], * errmsg;
+	sprintf_s(sql, 512, "select c.course_name, cs.score from t_student as s, t_course as c, t_course_score as cs where cs.stu_id = %lld and s.stu_id = cs.stu_id and c.course_id = cs.course_id;", info->id);
+	printf("%s 同学，你的成绩如下: \n", info->name);
+	sqlite3_exec(SQL->db, sql, QueryScoreCallBack, NULL, &errmsg);
+	system("pause");
+}
+
 void UpdateStudentInfo(int section, const char* newVal, StudentInfo* info)
 {
 	char sql[512]; char* errmsg;
@@ -171,7 +180,7 @@ void StudentProcess(long long id, Sql* sql)
 	StudentInfo s = QueryStudentInfo(id);
 	if (s.id == 0) {
 		MsgBox("未查询到账户学生信息，请联系管理员");
-		exit(511);
+		exit(512);
 	}
 	ClearScreen();
 	ShowStudentUi(&s);

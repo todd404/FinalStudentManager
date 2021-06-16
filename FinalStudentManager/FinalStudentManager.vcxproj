@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="char_conversion.c" />
-    <ClCompile Include="char_conversion.h" />
+    <ClCompile Include="AdminFunction.c" />
+    <ClCompile Include="EditHelper.c" />
     <ClCompile Include="InputFunction.c" />
     <ClCompile Include="login.c" />
     <ClCompile Include="main.c" />
@@ -30,6 +30,8 @@
     <ClCompile Include="ToolFunction.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AdminFunction.h" />
+    <ClInclude Include="EditHelper.h" />
     <ClInclude Include="InputFunction.h" />
     <ClInclude Include="login.h" />
     <ClInclude Include="md5.h" />
