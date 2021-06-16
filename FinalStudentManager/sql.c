@@ -31,3 +31,10 @@ int IsTeacherIdInDB(Sql* sql, const char* id)
 	sprintf_s(testSql, 512, "select teacher_id from t_teacher where teacher_id = %s", id);
 	return GetResultCount(sql, testSql);
 }
+
+int IsAccountUserInDB(Sql* sql, const char* user)
+{
+	char testSql[512];
+	sprintf_s(testSql, 512, "select user from t_login where user = \"%s\";", user);
+	return GetResultCount(sql, testSql);
+}

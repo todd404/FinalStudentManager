@@ -8,11 +8,12 @@ Sql* SQL;
 typedef void (*AdminFunction)();
 
 void SignupNewAccount();
+void DeleteAccount();
 void CreateCourse();
 void AdminEditStudentInfo();
 void AdminExit() { exit(0); }
 
-AdminFunction ADMIN_FUN_TABLE[5] = { SignupNewAccount, SignupNewAccount, AdminEditStudentInfo, CreateCourse, AdminExit};
+AdminFunction ADMIN_FUN_TABLE[6] = { SignupNewAccount, DeleteAccount, AdminEditStudentInfo, CreateCourse, NULL, AdminExit};
 
 void PrintAdminMenu()
 {
@@ -21,7 +22,8 @@ void PrintAdminMenu()
 	printf("\t2. 删除用户\n");
 	printf("\t3. 修改用户\n");
 	printf("\t4. 创建课程\n");
-	printf("\t5. 退出\n");
+	printf("\t5. 设置教师课程\n");
+	printf("\t6. 退出\n");
 	printf("=====================================\n");
 	printf("请输入选项: ");
 }
@@ -284,9 +286,11 @@ section_loop:
 	return atoll(newStuInfo[0]);
 }
 
-void InsertTeacherInfoToDB(char teacherInfo[][512]) 
+void InsertTeacherInfoToDB(char teacherInfo[2][512]) 
 {
-
+	char sql[512];
+	sprintf_s(sql, 512, "insert into t_teacher values (%s, \"%s\");", teacherInfo[0], teacherInfo[1]);
+	sqlite3_exec(SQL->db, sql, NULL, NULL, NULL);
 }
 
 long long InsertNewTeacherInfo() 
@@ -299,7 +303,7 @@ get_id:
 	printf("请输入工号: ");
 	GetInput(newTeacherInfo[0], 512, NO_COVER, Number);
 	if (IsTeacherIdInDB(SQL, newTeacherInfo[0])) {
-		MsgBox("该学号已存在！请重新输入！");
+		MsgBox("该工号已存在！请重新输入！");
 		goto get_id;
 	}
 	printf("请输入姓名：");
@@ -311,6 +315,7 @@ get_id:
 
 void SignupNewAccount()
 {
+	ClearScreen();
 	char user_name[512] = "", password[512] = "";
 	int user_group;
 	printf("====== 注册新用户 ======\n");
@@ -325,9 +330,41 @@ get_user_group:
 		MsgBox("请输入正确用户组");
 		goto get_user_group;
 	}
-	long long id;
+	long long id = 0;
 	if (user_group == 1)
 		id = InsertNewStuInfo();
 	if (user_group == 2)
 		id = InsertNewTeacherInfo();
+
+	char insertId[512];
+	if (id == 0)	strcpy_s(insertId, 512, "null");
+	else sprintf_s(insertId, 512, "%lld", id);
+
+	char insertGroup[2];
+	_itoa_s(user_group, insertGroup, 2, 10);
+
+	char sql[512];
+	char passwordMd5[MD5_STR_LEN];
+	md5Encode(password, strlen(password), passwordMd5);
+	sprintf_s(sql, 512, "insert into t_login values (\"%s\", \"%s\", %s, %s);", user_name, passwordMd5, insertGroup, insertId);
+	sqlite3_exec(SQL->db, sql, NULL, NULL, NULL);
+}
+
+//删除用户相关
+void DeleteAccount()
+{
+	ClearScreen();
+	printf("===== 删除用户 =====\n");
+get_user_name:
+	printf("请输入用户名: ");
+	char user_name[512];
+	UserNameInput(user_name);
+	if (!IsAccountUserInDB(SQL, user_name)) {
+		MsgBox("用户名不存在！");
+		goto get_user_name;
+	}
+
+	char sql[512];
+	sprintf_s(sql, 512, "delete from t_login where user = \"%s\";", user_name);
+	sqlite3_exec(SQL->db, sql, NULL, NULL, NULL);
 }

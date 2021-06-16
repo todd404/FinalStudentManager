@@ -17,3 +17,4 @@ void OpenDB(Sql* sql);
 int GetResultCount(Sql* sql, const char* s);
 int IsStudentIdInDB(Sql* sql, const char* id);
 int IsTeacherIdInDB(Sql* sql, const char* id);
+int IsAccountUserInDB(Sql* sql, const char* user);
