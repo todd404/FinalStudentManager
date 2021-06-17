@@ -38,3 +38,10 @@ int IsAccountUserInDB(Sql* sql, const char* user)
 	sprintf_s(testSql, 512, "select user from t_login where user = \"%s\";", user);
 	return GetResultCount(sql, testSql);
 }
+
+int IsTeacherHoldCourse(Sql* sql, const char* teacher_id, const char* course_id)
+{
+	char testSql[512];
+	sprintf_s(testSql, 512, "select t.teacher_name, c.course_name from t_teacher as t, t_course as c, t_teacher_course as tc where tc.teacher_id = %s and tc.course_id = %s and tc.teacher_id = t.teacher_id and tc.course_id = c.course_id;", teacher_id, course_id);
+	return GetResultCount(sql, testSql);
+}

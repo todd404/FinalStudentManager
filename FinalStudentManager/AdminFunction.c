@@ -11,9 +11,10 @@ void SignupNewAccount();
 void DeleteAccount();
 void CreateCourse();
 void AdminEditStudentInfo();
+void CourseManager();
 void AdminExit() { exit(0); }
 
-AdminFunction ADMIN_FUN_TABLE[6] = { SignupNewAccount, DeleteAccount, AdminEditStudentInfo, CreateCourse, NULL, AdminExit};
+AdminFunction ADMIN_FUN_TABLE[6] = { SignupNewAccount, DeleteAccount, AdminEditStudentInfo, CreateCourse, CourseManager, AdminExit};
 
 void PrintAdminMenu()
 {
@@ -22,7 +23,7 @@ void PrintAdminMenu()
 	printf("\t2. 删除用户\n");
 	printf("\t3. 修改用户\n");
 	printf("\t4. 创建课程\n");
-	printf("\t5. 设置教师课程\n");
+	printf("\t5. 教师课程管理\n");
 	printf("\t6. 退出\n");
 	printf("=====================================\n");
 	printf("请输入选项: ");
@@ -35,7 +36,7 @@ void ShowAdminUi()
 		PrintAdminMenu();
 
 		int section = GetSection();
-		if (section < 1 || section > 5)
+		if (section < 1 || section > 6)
 			continue;
 
 		ADMIN_FUN_TABLE[section - 1]();
@@ -367,4 +368,131 @@ get_user_name:
 	char sql[512];
 	sprintf_s(sql, 512, "delete from t_login where user = \"%s\";", user_name);
 	sqlite3_exec(SQL->db, sql, NULL, NULL, NULL);
+}
+
+//教师课程管理相关
+typedef void (*COURSE_MANAGER_FUNCTION)(const char*);
+
+void PrintTeacherCourseSection()
+{
+	printf("=======================\n");
+	printf("1. 查询执教课程\n");
+	printf("2. 添加课程\n");
+	printf("3. 删除课程\n");
+	printf("4. 退出\n");
+	printf("=======================\n");
+	printf("请输入选项: ");
+}
+
+int QueryTeacherCourseCallBack(void* para, int colNum, char** colVal, char** colName)
+{
+	printf("课程名称: %s\n", colVal[0]);
+	printf("课程代码: %s\n", colVal[1]);
+	printf("执教教师: %s\n", colVal[2]);
+	printf("=======================\n");
+	return 0;
+}
+
+void QueryTeacherCourse(const char* teacher_id)
+{
+	ClearScreen();
+	printf("=======================\n");
+	char sql[512];
+	sprintf_s(sql, 512, "select c.course_name, c.course_id, t.teacher_name from t_teacher as t, t_course as c, t_teacher_course as tc where tc.teacher_id = %s and tc.teacher_id = t.teacher_id and tc.course_id = c.course_id;" ,teacher_id);
+	sqlite3_exec(SQL->db, sql, QueryTeacherCourseCallBack, NULL, NULL);
+	system("pause");
+}
+
+void AddCourse(const char* teacher_id)
+{
+loop:
+	ClearScreen();
+	printf("=======================\n");
+	printf("请输入课程代码: ");
+
+	char course_id[512];
+	GetInput(course_id, 512, NO_COVER, Number);
+	if (!IsCourseExists(course_id)) {
+		MsgBox("课程不存在！");
+		goto loop;
+	}
+	if (IsTeacherHoldCourse(SQL, teacher_id, course_id)) {
+		MsgBox("该教师已执教该课程！");
+		return;
+	}
+
+	char sql[512];
+	sprintf_s(sql, 512, "insert into t_teacher_course values (%s, %s);", teacher_id, course_id);
+	sqlite3_exec(SQL->db, sql, NULL, NULL, NULL);
+}
+
+void DeleteCourse(const char* teacher_id)
+{
+loop:
+	ClearScreen();
+	printf("=======================\n");
+	printf("请输入课程代码: ");
+
+	char course_id[512];
+	GetInput(course_id, 512, NO_COVER, Number);
+	if (!IsCourseExists(course_id)) {
+		MsgBox("课程不存在！");
+		goto loop;
+	}
+	if (!IsTeacherHoldCourse(SQL, teacher_id, course_id)) {
+		MsgBox("该教师未执教该课程！");
+		return;
+	}
+
+	char sql[512];
+	sprintf_s(sql, 512, "delete from t_teacher_course where teacher_id = %s and course_id = %s;", teacher_id, course_id);
+	sqlite3_exec(SQL->db, sql, NULL, NULL, NULL);
+}
+
+COURSE_MANAGER_FUNCTION COURSE_FUN_TABLE[3] = {QueryTeacherCourse, AddCourse, DeleteCourse};
+
+int GetTeacherNameCallBack(void* teacher_name, int colNum, char** colVal, char** colName)
+{
+	char* ptr = (char*)teacher_name;
+	strcpy_s(ptr, 512, colVal[0]);
+}
+
+void GetTeacherName(char* const teacher_id, char* teacher_name)
+{
+	char sql[512];
+	sprintf_s(sql, 512, "select teacher_name from t_teacher where teacher_id = %s", teacher_id);
+	sqlite3_exec(SQL->db, sql, GetTeacherNameCallBack, (void*)teacher_name, NULL);
+}
+
+void CourseManager()
+{
+	ClearScreen();
+	printf("===== 教师课程管理 =====\n");
+	char teacher_id[512];
+get_id:
+	printf("请输入工号: ");
+	GetInput(teacher_id, 512, NO_COVER, Number);
+	if (!IsTeacherIdInDB(SQL, teacher_id)) {
+		MsgBox("该工号不存在！请重新输入！");
+		goto get_id;
+	}
+
+get_section:
+	ClearScreen();
+	char teacher_name[512];
+	GetTeacherName(teacher_id, teacher_name);
+	printf("工号: %s, 姓名: %s\n", teacher_id, teacher_name);
+	PrintTeacherCourseSection();
+	int section = GetSection();
+
+	if (section == 4)
+		return;
+	if (section < 1 || section > 3)
+	{
+		MsgBox("请输入正确的选项！");
+		goto get_section;
+	}
+	
+	COURSE_FUN_TABLE[section - 1](teacher_id);
+	goto get_section;
 }

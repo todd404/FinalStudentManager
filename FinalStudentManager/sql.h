@@ -18,3 +18,4 @@ int GetResultCount(Sql* sql, const char* s);
 int IsStudentIdInDB(Sql* sql, const char* id);
 int IsTeacherIdInDB(Sql* sql, const char* id);
 int IsAccountUserInDB(Sql* sql, const char* user);
+int IsTeacherHoldCourse(Sql* sql, const char* teacher_id, const char* course_id);
