@@ -1,10 +1,12 @@
+#pragma once
+
 #include "login.h"
 #include "AdminFunction.h"
 #include "StudentFunction.h"
+#include "TeacherFunction.h"
 
 #include <stdio.h>
 #include <string.h>
-#pragma once
 
 typedef void(*ProcessFunction)(long long, Sql*);
 typedef struct {
@@ -13,7 +15,7 @@ typedef struct {
 	UserGroup group;
 	long long id;
 } LoginInfo;
-ProcessFunction ProcessTable[3] = { StudentProcess, NULL, AdminProcess};
+ProcessFunction ProcessTable[3] = { StudentProcess, TeacherProcess, AdminProcess};
 
 void LoginInfoInit(LoginInfo* info)
 {
@@ -103,7 +105,7 @@ void LoginProccess(Sql* sql)
 			exit(1203);
 		}
 		if (count > 0)
-			MsgBox("用户名或密码错误");
+			ErrorMsgBox("用户名或密码错误");
 
 		ShowLoginUi();
 		GetUser(&info);

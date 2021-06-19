@@ -50,13 +50,6 @@ void AdminProcess(long long id, Sql* sql)
 }
 
 //创建课程相关
-int IsCourseExists(const char* courseId)
-{
-	char codeTestSql[512];
-	sprintf_s(codeTestSql, 512, "select course_id from t_course where course_id = %s", courseId);
-	int r = GetResultCount(SQL, codeTestSql);
-	return r;
-}
 
 int InsertNewCourse(const char* course_id, const char* course_name, const char* credit)
 {
@@ -75,8 +68,8 @@ loop:
 	printf("课程代码: ");
 	char courseId[512];
 	GetInput(courseId, 511, NO_COVER, Number);
-	if (IsCourseExists(courseId)) {
-		MsgBox("课程代码已存在！");
+	if (IsCourseIdInDB(SQL, courseId)) {
+		ErrorMsgBox("课程代码已存在！");
 		goto loop;
 	}
 
@@ -134,7 +127,7 @@ loop:
 	char stuId[512];
 	GetInput(stuId, 512, NO_COVER, Number);
 	if (!IsStudentIdInDB(SQL, stuId)) {
-		MsgBox("学号不存在! 请重新输入！");
+		ErrorMsgBox("学号不存在! 请重新输入！");
 		goto loop;
 	}
 	return atoll(stuId);
@@ -165,11 +158,11 @@ loop:
 	AdminPrintEditSection();
 	int section = GetSection();
 	if (section == 3) {
-		MsgBox("请直接修改生日！");
+		ErrorMsgBox("请直接修改生日！");
 		goto loop;
 	}
 	if (section < 1 && section > 9) {
-		MsgBox("请输入正确选项！");
+		ErrorMsgBox("请输入正确选项！");
 		goto loop;
 	}
 
@@ -184,7 +177,7 @@ section_loop:
 		printf("（男或女）");
 		gets_s(newVal, 512);
 		if (!IsGender(newVal)) {
-			MsgBox("请输入性别！");
+			ErrorMsgBox("请输入性别！");
 			goto section_loop;
 		}
 		break;
@@ -192,14 +185,14 @@ section_loop:
 		printf("(YYYY-MM-DD) ");
 		GetInput(newVal, 10, NO_COVER, Date);
 		if (!IsDate(newVal)) {
-			MsgBox("请输入正确日期！");
+			ErrorMsgBox("请输入正确日期！");
 			goto section_loop;
 		}
 		break;
 	case 6:
 		PhoneNumberInput(newVal);
 		if (strlen(newVal) != 11) {
-			MsgBox("请输入正确的手机号码？");
+			ErrorMsgBox("请输入正确的手机号码？");
 			goto section_loop;
 		}
 		break;
@@ -249,7 +242,7 @@ section_loop:
 		case 1:get_id:	//获取id
 			GetInput(newStuInfo[i], 512, NO_COVER, Number);
 			if (IsStudentIdInDB(SQL, newStuInfo[i])) {
-				MsgBox("该学号已存在！请重新输入！");
+				ErrorMsgBox("该学号已存在！请重新输入！");
 				printf("学号: ");
 				goto get_id;
 			}
@@ -258,7 +251,7 @@ section_loop:
 			printf("（男或女）");
 			gets_s(newStuInfo[i], 512);
 			if (!IsGender(newStuInfo[i])) {
-				MsgBox("请输入性别！");
+				ErrorMsgBox("请输入性别！");
 				goto section_loop;
 			}
 			break;
@@ -266,14 +259,14 @@ section_loop:
 			printf("(YYYY-MM-DD) ");
 			GetInput(newStuInfo[i], 10, NO_COVER, Date);
 			if (!IsDate(newStuInfo[i])) {
-				MsgBox("请输入正确日期！");
+				ErrorMsgBox("请输入正确日期！");
 				goto section_loop;
 			}
 			break;
 		case 6:
 			PhoneNumberInput(newStuInfo[i]);
 			if (strlen(newStuInfo[i]) != 11) {
-				MsgBox("请输入正确的手机号码？");
+				ErrorMsgBox("请输入正确的手机号码？");
 				goto section_loop;
 			}
 			break;
@@ -304,7 +297,7 @@ get_id:
 	printf("请输入工号: ");
 	GetInput(newTeacherInfo[0], 512, NO_COVER, Number);
 	if (IsTeacherIdInDB(SQL, newTeacherInfo[0])) {
-		MsgBox("该工号已存在！请重新输入！");
+		ErrorMsgBox("该工号已存在！请重新输入！");
 		goto get_id;
 	}
 	printf("请输入姓名：");
@@ -328,7 +321,7 @@ get_user_group:
 	printf("用户组(1. 学生, 2.教师, 3.管理员): ");
 	user_group = GetSection();
 	if (user_group < 1 || user_group > 3) {
-		MsgBox("请输入正确用户组");
+		ErrorMsgBox("请输入正确用户组");
 		goto get_user_group;
 	}
 	long long id = 0;
@@ -361,7 +354,7 @@ get_user_name:
 	char user_name[512];
 	UserNameInput(user_name);
 	if (!IsAccountUserInDB(SQL, user_name)) {
-		MsgBox("用户名不存在！");
+		ErrorMsgBox("用户名不存在！");
 		goto get_user_name;
 	}
 
@@ -412,12 +405,12 @@ loop:
 
 	char course_id[512];
 	GetInput(course_id, 512, NO_COVER, Number);
-	if (!IsCourseExists(course_id)) {
-		MsgBox("课程不存在！");
+	if (!IsCourseIdInDB(SQL, course_id)) {
+		ErrorMsgBox("课程不存在！");
 		goto loop;
 	}
 	if (IsTeacherHoldCourse(SQL, teacher_id, course_id)) {
-		MsgBox("该教师已执教该课程！");
+		ErrorMsgBox("该教师已执教该课程！");
 		return;
 	}
 
@@ -435,12 +428,12 @@ loop:
 
 	char course_id[512];
 	GetInput(course_id, 512, NO_COVER, Number);
-	if (!IsCourseExists(course_id)) {
-		MsgBox("课程不存在！");
+	if (!IsCourseIdInDB(SQL, course_id)) {
+		ErrorMsgBox("课程不存在！");
 		goto loop;
 	}
 	if (!IsTeacherHoldCourse(SQL, teacher_id, course_id)) {
-		MsgBox("该教师未执教该课程！");
+		ErrorMsgBox("该教师未执教该课程！");
 		return;
 	}
 
@@ -473,7 +466,7 @@ get_id:
 	printf("请输入工号: ");
 	GetInput(teacher_id, 512, NO_COVER, Number);
 	if (!IsTeacherIdInDB(SQL, teacher_id)) {
-		MsgBox("该工号不存在！请重新输入！");
+		ErrorMsgBox("该工号不存在！请重新输入！");
 		goto get_id;
 	}
 
@@ -489,7 +482,7 @@ get_section:
 		return;
 	if (section < 1 || section > 3)
 	{
-		MsgBox("请输入正确的选项！");
+		ErrorMsgBox("请输入正确的选项！");
 		goto get_section;
 	}
 	

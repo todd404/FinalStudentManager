@@ -19,3 +19,5 @@ int IsStudentIdInDB(Sql* sql, const char* id);
 int IsTeacherIdInDB(Sql* sql, const char* id);
 int IsAccountUserInDB(Sql* sql, const char* user);
 int IsTeacherHoldCourse(Sql* sql, const char* teacher_id, const char* course_id);
+int IsCourseIdInDB(Sql* sql, const char* courseId);
+int IsScoreInDb(Sql* sql, char* const student_id, char* const course_id);

@@ -122,7 +122,7 @@ loop:
 	PrintEditSection();
 	int section = GetSection();
 	if (section != 6 && section != 9){
-		MsgBox("该账户不能修改这个信息，请联系管理员修改");
+		ErrorMsgBox("该账户不能修改这个信息，请联系管理员修改");
 		goto loop;
 	}
 
@@ -133,7 +133,7 @@ get_phone_number:
 	if (section == 6) {
 		PhoneNumberInput(newVal);
 		if (strlen(newVal) != 11) {
-			MsgBox("请输入正确的手机号码？");
+			ErrorMsgBox("请输入正确的手机号码？");
 			goto get_phone_number;
 		}
 	}
@@ -179,7 +179,7 @@ void StudentProcess(long long id, Sql* sql)
 	SQL = sql;
 	StudentInfo s = QueryStudentInfo(id);
 	if (s.id == 0) {
-		MsgBox("未查询到账户学生信息，请联系管理员");
+		ErrorMsgBox("未查询到账户学生信息，请联系管理员");
 		exit(512);
 	}
 	ClearScreen();

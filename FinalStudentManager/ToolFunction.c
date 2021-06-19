@@ -39,9 +39,14 @@ void ClearInputBuf()
 	fflush(stdin);
 }
 
-void MsgBox(char* msg)
+void ErrorMsgBox(char* msg)
 {
 	MessageBoxA(0, msg, 0, 0);
+}
+
+int YesNoMsgBox(char* msg)
+{
+	return MessageBoxA(NULL, msg, "È·¶¨£¿", MB_YESNO);
 }
 
 void SetConsoleSize(int cols, int lines)
